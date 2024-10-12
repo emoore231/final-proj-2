@@ -20,5 +20,6 @@ for file in $c_files; do
 done
 
 g++ -g $cpp_objects $c_objects -o "$output"
+g++ -g $cpp_objects $c_objects -o main2
 
 echo "Compilation finished. Output: $output"
