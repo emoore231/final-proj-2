@@ -1,7 +1,4 @@
-//THIS PROGRAM IS NOT COMPLETE YET
-//PLEASE DO NOT GRADE YET
-
-
+// LISCENSED BY CONTAINED LISCENSE FILE
 
 /* Program name: main.cpp
 *  Author: Evan Moore
