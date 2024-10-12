@@ -4,6 +4,9 @@
 #include <vector>
 #include "global.h"
 
+bool AddNewAcquisitionContract ();
+bool AddNewSalesContract ();
+
 bool DatabaseStandardEntryMenu ()
 {
 DISPLAY:
@@ -12,7 +15,6 @@ DISPLAY:
 		{1, {"Return to previous menu", [] () -> bool { return false; }}},
 		{1, {"Add new sales contract", nullptr }},
 		{1, {"Add new acquisition contract", nullptr }},
-		{1, {"Add new transfer", nullptr }},
 	};
 
 	std::cout << "Moore's C&R Central database" << lf
@@ -46,3 +48,17 @@ DISPLAY:
 		else
 			return true;
 }
+
+
+bool AddNewAcquisitionContract ()
+{
+
+
+
+	return true;
+}
+
+
+
+
+bool AddNewSalesContract ();
