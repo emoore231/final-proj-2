@@ -11,7 +11,7 @@ bool AddNewAcquisitionContract ();
 bool DatabaseStandardEntryMenu ()
 {
 DISPLAY:
-
+	//menu otps
 	const static std::vector<std::pair<int, std::pair<std::string, fptr_t>>> menuOptions = {
 		{1, {"Return to previous menu", [] () -> bool { return false; }}},
 		{1, {"Add new acquisition contract", AddNewAcquisitionContract }},
@@ -52,6 +52,7 @@ DISPLAY:
 
 bool AddNewAcquisitionContract ()
 {
+	//get products
 	std::vector<std::vector<std::string>> productsToInsert;
 
 	std::cout << "Enter the products or QUIT to stop adding products" << lf;
@@ -83,7 +84,7 @@ bool AddNewAcquisitionContract ()
 	while (true);
 
 	std::vector<std::string> acquisitionContract;
-
+	//get contract info
 	try
 	{
 		{
@@ -138,12 +139,15 @@ bool AddNewAcquisitionContract ()
 	}
 
 	try
-	{
+	{//commit to database
 		SQL::Database database ("master.db");
 		SQL::Transaction transaction = database.BeginTransaction ();
 		database.Close ();
 
 		SQL::Result res = transaction.ExecutePrepared (SQL::ParameterizedQuery (R"(INSERT INTO ACQUISITION_CONTRACT (PURCHASER_ID, JURISDICTION_ID, NEGOTIATER_ID, MANAGER_ID, GRAND_TOTAL, DATE) VALUES (?,?,?,?,?,?) RETURNING ID;)", acquisitionContract));
+		//!!!
+		//this needs sqlite 3.35.0, if it fails, build with compile.sh
+		//!!!
 
 		std::string acquisitionContractId;
 		for (auto& i : res.Data)

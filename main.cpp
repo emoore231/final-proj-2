@@ -98,6 +98,9 @@ ENTER_PASSWORD:
 
 int ValidateUserCredentials (const std::string& username, const secure_string& password)
 {
+	//I was going to add a users.db
+	//but it is already Friday
+	//so you get Windows style 'security' instead
 	return 5;
 }
 
@@ -269,6 +272,7 @@ extern const std::map<Table, std::string> TableToSelectionQuery {
 	{Table::EMPLOYEE_CHANGE,				R"(SELECT * FROM EMPLOYEE_CHANGE;)"},
 };
 
+//not used
 extern const std::map<Table, std::string> TableToFilterQuery {
 	{Table::JURISDICTION,					R"(SELECT * FROM JURISDICTION WHERE (STATE LIKE ? OR ? IS NULL) AND (COUNTY LIKE ? OR ? IS NULL) AND (CITY LIKE ? OR ? IS NULL) AND (ADDITIONAL LIKE ? OR ? IS NULL));)"},
 	{Table::LOCATION,						R"(SELECT * FROM LOCATION WHERE (ADDR_LINE_1 LIKE ? OR ? IS NULL) AND (ADDR_LINE_2 LIKE ? OR ? IS NULL) AND (STATE LIKE ? OR ? IS NULL) AND (CITY LIKE ? OR ? IS NULL) AND (ZIP_CODE LIKE ? OR ? IS NULL));)"},

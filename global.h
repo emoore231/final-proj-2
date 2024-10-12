@@ -127,9 +127,10 @@ inline std::string LookupForeignKey (Table table)
 		std::string query = TableToSelectionQuery.at (table);
 
 		SQL::Database database ("master.db");
-
+		//get results
 		SQL::Result res = database.ExecutePrepared (SQL::Query (query));
 
+		//print options
 		int k = 0;
 		for (auto& i : res.Data)
 		{
@@ -138,7 +139,7 @@ inline std::string LookupForeignKey (Table table)
 		}
 
 		database.Close ();
-
+		//get record
 		std::cout << "SELECT RECORD ID: ";
 		size_t i;
 		std::cin >> std::ws >> i;

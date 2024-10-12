@@ -13,6 +13,7 @@ std::string LookupForeignKey (Table table);
 
 bool DatabaseInsertRecordIntoTableMenu ()
 {
+	//get table to insert into
 	Table table;
 	std::string opt;
 	do try
@@ -48,6 +49,7 @@ bool DatabaseInsertRecordIntoTableMenu ()
 
 	std::vector<std::string> params;
 
+	//enter all of the fields
 	std::cout << "Enter the fields for the insertion or \'NULL\' for null values, or type \'LOOKUP\' to lookup a value for a foreign key." << lf;
 
 	if (inTransaction)
@@ -76,6 +78,7 @@ bool DatabaseInsertRecordIntoTableMenu ()
 		}
 	}
 
+	//confirm
 	std::cout << lf << "Confirm these options" << lf;
 	if (inTransaction)
 		std::cout << "TRANSACTION MODE" << lf;
@@ -108,7 +111,7 @@ bool DatabaseInsertRecordIntoTableMenu ()
 	}
 	while (true);
 
-
+	//write to database
 	if (inTransaction)
 	{
 		try

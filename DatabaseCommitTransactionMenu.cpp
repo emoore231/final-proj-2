@@ -8,6 +8,7 @@
 
 bool DatabaseCommitTransactionMenu ()
 {
+	//check if no transaction
 	if (!inTransaction)
 	{
 		std::cout << "No transaction is in progress.\nNo operation was performed." << lf;
@@ -23,13 +24,13 @@ bool DatabaseCommitTransactionMenu ()
 
 	std::cout << "Do you want to commit this transaction? (Y/N)" << lf
 		<< "There are " << currentTransactionOperationCount << " operations pending." << lf;
-
+	//get opt
 	std::string opt;
 	std::cin >> std::ws >> opt;
 	for (auto& i : opt)	if (i >= 'A' && i <= 'Z') i += 'a' - 'A';
 
 	if (opt == "y" || opt == "yes")	try
-	{
+	{//commit
 		currentTransactionDatabase->Commit ();
 		currentTransactionOperationCount = 0;
 		inTransaction = false;
@@ -39,7 +40,7 @@ bool DatabaseCommitTransactionMenu ()
 		return true;
 	}
 	catch (...)
-	{
+	{//handle
 		try
 		{
 			currentTransactionDatabase->Rollback ();

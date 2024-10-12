@@ -14,7 +14,7 @@ static inline bool SearchLocationsByHandguns();
 bool DatabaseGenerateReports ()
 {
 DISPLAY:
-
+    //menu opts
 	const static std::vector<std::pair<int, std::pair<std::string, fptr_t>>> menuOptions = {
 		{1, {"Return to previous menu", [] () -> bool { return false; }}},
 		{1, {"Search negotiators by total value of contracts", SearchNegotiatorsByValue }},
@@ -79,6 +79,7 @@ FROM
 ORDER BY TVA DESC, TVS DESC;
 )";
 
+    //open 'n execute
     SQL::Database db;
     db.Open ("master.db");
     SQL::Result res = db.ExecutePrepared (SQL::Query (Query));
@@ -90,6 +91,7 @@ ORDER BY TVA DESC, TVS DESC;
             << "Total value of Sales Contracts: " << i.at ("TVS") << lf << lf;
     }
 
+    //close
     db.Close ();
 
 	return true;
@@ -157,10 +159,12 @@ FROM
 );
 )";
 
+    //open and execute
     SQL::Database db;
     db.Open ("master.db");
     SQL::Result res = db.ExecutePrepared (SQL::Query (Query));
 
+    //print
     for (const auto& i : res.Data)
     {
         std::cout << "Manager: " << i.at ("M") << lf
@@ -214,6 +218,7 @@ GROUP BY LOCATION.STATE
 ORDER BY COUNT(PRODUCT.ID) DESC;
 )";
 
+    //open and execute
     SQL::Database db;
     db.Open ("master.db");
     SQL::Result res = db.ExecutePrepared (SQL::Query (Query));

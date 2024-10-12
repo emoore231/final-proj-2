@@ -43,11 +43,12 @@ DISPLAY:
 
 	std::cout << "Please select a menu option:" << lf;
 
+	//print menu
 	int i = 1;
 	for (const auto menuOption : menuOptions)
 		if (accessLevel >= menuOption.first)
 			std::cout << '\t' << i++ << ": " << menuOption.second.first << std::endl;
-
+	//get opt and execute
 	try
 	{
 		std::cin >> std::ws >> i;

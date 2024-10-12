@@ -7,6 +7,7 @@
 
 bool DatabaseRollbackTransactionMenu ()
 {
+	//check transaction
 	if (!inTransaction)
 	{
 		std::cout << "No transaction is in progress.\nNo operation was performed." << lf;
@@ -21,9 +22,9 @@ bool DatabaseRollbackTransactionMenu ()
 	std::string opt;
 	std::cin >> std::ws >> opt;
 	for (auto& i : opt)	if (i >= 'A' && i <= 'Z') i += 'a' - 'A';
-
+	//get confirm
 	if (opt == "y" || opt == "yes")	try
-	{
+	{//rollback
 		currentTransactionDatabase->Rollback ();
 		currentTransactionOperationCount = 0;
 		inTransaction = false;
@@ -36,7 +37,7 @@ bool DatabaseRollbackTransactionMenu ()
 	{
 		std::cout << "Transaction failed to roll back, the database is in an inconsistent and/or inoperable state. The program will now terminate.";
 		std::this_thread::sleep_for (std::chrono::seconds (2));
-		throw "FAIL_FAST";
+		throw "FAIL_FAST";//bypasses all exception handlers, just like exit() but I can break
 	}
 	else
 	{
