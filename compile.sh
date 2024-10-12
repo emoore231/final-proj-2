@@ -1,9 +1,9 @@
 #!/bin/bash
 
-output="program.out"
+output="main"
 
-cpp_files=$(find . -name "*.cpp")
-c_files=$(find . -name "*.c")
+cpp_files=$(find . -maxdepth 1 -name "*.cpp")
+c_files=$(find . -maxdepth 1 -name "*.c")
 
 cpp_objects=""
 for file in $cpp_files; do
