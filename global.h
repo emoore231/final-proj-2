@@ -4,6 +4,7 @@
 #include <map>
 #include <vector>
 #include <iostream>
+#include "SQLiteDB.h"
 
 namespace SQL
 {
@@ -118,3 +119,49 @@ extern const std::map<Table, std::string> TableToFilterQuery;
 extern const std::map<Table, std::vector<std::pair<std::string, Type>>> TableToInsertionFields; 
 extern const std::map<Table, std::string> TableToUpdateQuery;
 extern const std::map<Table, std::string> TableToDeleteQuery;
+
+inline std::string LookupForeignKey (Table table)
+{
+	for (;;) try
+	{
+		std::string query = TableToSelectionQuery.at (table);
+
+		SQL::Database database ("master.db");
+
+		SQL::Result res = database.ExecutePrepared (SQL::Query (query));
+
+		int k = 0;
+		for (auto& i : res.Data)
+		{
+			std::cout << i.at ("ID") << ": " << i << lf;
+			k++;
+		}
+
+		database.Close ();
+
+		std::cout << "SELECT RECORD ID: ";
+		size_t i;
+		std::cin >> std::ws >> i;
+		if (i < 1 || i > k)
+		{
+			std::cout << "OPTION NOT RECOGNIZED" << std::endl;
+			continue;
+		}
+		return std::to_string (i);
+	}
+	catch (const std::ios_base::failure&)
+	{
+		HandleIstreamFailure ();
+		continue;
+	}
+	catch (const std::out_of_range&)
+	{
+		std::cout << "TABLE NOT FOUND";
+		throw;
+	}
+	catch (const SQL::Exception& ex)
+	{
+		std::cout << "TABLE NOT FOUND OR RECORDS INACCESSIBLE" << std::endl;
+		throw;
+	}
+}

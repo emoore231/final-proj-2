@@ -83,7 +83,7 @@ ORDER BY TVA DESC, TVS DESC;
     db.Open ("master.db");
     SQL::Result res = db.ExecutePrepared (SQL::Query (Query));
 
-    for (const auto& i : res)
+    for (const auto& i : res.Data)
     {
         std::cout << "Negotiator: " << i.at ("N") << lf
             << "Total value of Acquisition Contracts: " << i.at ("TVA") << lf
@@ -161,7 +161,7 @@ FROM
     db.Open ("master.db");
     SQL::Result res = db.ExecutePrepared (SQL::Query (Query));
 
-    for (const auto& i : res)
+    for (const auto& i : res.Data)
     {
         std::cout << "Manager: " << i.at ("M") << lf
             << "Most regulated product type purchased: " << i.at ("PT") << lf
@@ -218,7 +218,7 @@ ORDER BY COUNT(PRODUCT.ID) DESC;
     db.Open ("master.db");
     SQL::Result res = db.ExecutePrepared (SQL::Query (Query));
 
-    for (const auto& i : res)
+    for (const auto& i : res.Data)
     {
         std::cout << "State: " << i.at ("S") << lf
             << "Number of handguns sold: " << i.at ("NHS") << lf << lf;

@@ -12,7 +12,7 @@ endif()
 project ("CMakeProject5")
 
 # Add source to this project's executable.
-add_executable (CMakeProject5 "main.cpp" "DatabaseAdvancedManipulationMenu.cpp" "DatabaseBeginTransactionMenu.cpp" "DatabaseCommitTransactionMenu.cpp" "DatabaseDeleteRecordMenu.cpp" "DatabaseGenerateReports.cpp" "DatabaseInsertRecordIntoTableMenu.cpp" "DatabaseMainMenu.cpp" "DatabaseRollbackTransactionMenu.cpp" "DatabaseStandardEntryMenu.cpp" "DatabaseUpdateRecordMenu.cpp" "SQLiteDB.cpp" "sqlite3.c" "DatabaseTransactMenu.cpp")
+add_executable (CMakeProject5 "main.cpp" "DatabaseAdvancedManipulationMenu.cpp" "DatabaseBeginTransactionMenu.cpp" "DatabaseCommitTransactionMenu.cpp" "DatabaseDeleteRecordMenu.cpp" "DatabaseGenerateReports.cpp" "DatabaseInsertRecordIntoTableMenu.cpp" "DatabaseMainMenu.cpp" "DatabaseRollbackTransactionMenu.cpp" "DatabaseStandardEntryMenu.cpp" "DatabaseUpdateRecordMenu.cpp" "SQLiteDB.cpp" "sqlite3.c" )
 
 if (CMAKE_VERSION VERSION_GREATER 3.12)
   set_property(TARGET CMakeProject5 PROPERTY CXX_STANDARD 14)

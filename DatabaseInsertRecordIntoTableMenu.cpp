@@ -155,48 +155,4 @@ bool DatabaseInsertRecordIntoTableMenu ()
 	return true;
 }
 
-std::string LookupForeignKey (Table table)
-{
-	for (;;) try
-	{
-		std::string query = TableToSelectionQuery.at (table);
 
-		SQL::Database database ("master.db");
-
-		SQL::Result res = database.ExecutePrepared (SQL::Query (query));
-
-		int k = 0;
-		for (auto& i : res)
-		{
-			std::cout << i.at ("ID") << ": " << i << lf;
-			k++;
-		}
-
-		database.Close ();
-
-		std::cout << "SELECT RECORD ID: ";
-		size_t i;
-		std::cin >> std::ws >> i;
-		if (i < 1 || i > k)
-		{
-			std::cout << "OPTION NOT RECOGNIZED" << std::endl;
-			continue;
-		}
-		return std::to_string (i);
-	}
-	catch (const std::ios_base::failure&)
-	{
-		HandleIstreamFailure ();
-		continue;
-	}
-	catch (const std::out_of_range&)
-	{
-		std::cout << "TABLE NOT FOUND";
-		throw;
-	}
-	catch (const SQL::Exception& ex)
-	{
-		std::cout << "TABLE NOT FOUND OR RECORDS INACCESSIBLE" << std::endl;
-		throw;
-	}
-}

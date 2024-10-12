@@ -78,9 +78,10 @@ SQL::Result SQL::Database::ExecutePrepared (const ParameterizedQuery& q)
 {
 	SQL::Result res {};
 
+	sqlite3_stmt* statement;
 
 	//prepare the statement
-	int Code = sqlite3_prepare_v2 ((sqlite3*)(this->database), q.RawQuery ().c_str (), (int)q.RawQuery ().size (), (sqlite3_stmt**)&res.statement, nullptr);
+	int Code = sqlite3_prepare_v2 ((sqlite3*)(this->database), q.RawQuery ().c_str (), (int)q.RawQuery ().size (), &statement, nullptr);
 	if (Code)
 	{
 		const char* errMsg = sqlite3_errmsg ((sqlite3*)database);
@@ -92,50 +93,37 @@ SQL::Result SQL::Database::ExecutePrepared (const ParameterizedQuery& q)
 	//bind params
 	for (size_t i = 0; i < q.Parameters.size (); i++)
 	{
-		sqlite3_bind_text ((sqlite3_stmt*)res.statement, (int)i + 1, q.Parameters[i].c_str (), (int)q.Parameters[i].size (), SQLITE_STATIC);
+		sqlite3_bind_text (statement, (int)i + 1, q.Parameters[i].c_str (), (int)q.Parameters[i].size (), SQLITE_STATIC);
 	}
 
 	//init the result set if has values
-	switch (int Code = sqlite3_step ((sqlite3_stmt*)res.statement))
+	do 
+	switch (int Code = sqlite3_step (statement))
 	{
 		case SQLITE_ROW:
 			{//get cols
-				int ColCnt = sqlite3_column_count ((sqlite3_stmt*)res.statement);
-				std::vector<std::string> ColNames;
-				for (int i = 0; i < ColCnt; ++i)
+				std::map<std::string, std::string> row;
+				int cols = sqlite3_column_count (statement);
+				//add cols to result
+				for (int i = 0; i < cols; ++i)
 				{
-					ColNames.push_back (sqlite3_column_name ((sqlite3_stmt*)res.statement, i));
+					//sdd elements
+					std::string column_name = sqlite3_column_name (statement, i);
+					const unsigned char* column_value = sqlite3_column_text (statement, i);
+					row[column_name] = column_value ? rc<const char*>(column_value) : "";
 				}
-
-				//add them to the map and assign vector pointers
-				for (const auto& col : ColNames)
-				{
-					res.CurrentVal[col] = "";
-					res.CurrentValVector.push_back (&res.CurrentVal[col]);
-				}
-
-				//add first fields
-				for (int i = 0; i < res.CurrentVal.size (); ++i)
-				{
-					const char* Field = (const char*)sqlite3_column_text ((sqlite3_stmt*)res.statement, i);
-					if (Field)
-						*res.CurrentValVector[i] = std::string (Field);
-				}
+				res.Data.push_back (row);
 			}
 			res.HasData = true;
-			
-			return res;
-
+			break;
 		case SQLITE_DONE://no data, return control
-			res.HasData = false;
-			return res;
-		case SQLITE_INTERRUPT:
-			res.HasData = false;
+			res.HasData = true;
 			return res;
 		default:
-			sqlite3_finalize ((sqlite3_stmt*)res.statement);
+			sqlite3_finalize (statement);
 			throw Exception (SQLITE_ERROR, "An error occured");
 	}
+	while (true);
 }
 
 SQL::Result SQL::Database::ExecutePrepared (const Query& q)
@@ -164,46 +152,40 @@ SQL::Result SQL::Database::ExecutePreparedInPlace (const ParameterizedQuery& q)
 {
 	SQL::Result res {};
 
+	sqlite3_stmt* statement;
 
 	//prepare the statement
-	int Code = sqlite3_prepare_v2 ((sqlite3*)(this->database), q.RawQuery ().c_str (), (int)q.RawQuery ().size (), (sqlite3_stmt**)&res.statement, nullptr);
+	int Code = sqlite3_prepare_v2 ((sqlite3*)(this->database), q.RawQuery ().c_str (), (int)q.RawQuery ().size (), &statement, nullptr);
 	if (Code)
 	{
-		throw SQL::Exception (Code, "Error preparing statement");
+		const char* errMsg = sqlite3_errmsg ((sqlite3*)database);
+		std::string errMsgStr (errMsg);
+
+		throw SQL::Exception (Code, "Error preparing statement, MSG: " + errMsgStr);
 	}
 
 	//bind params
 	for (size_t i = 0; i < q.Parameters.size (); i++)
 	{
-		sqlite3_bind_text ((sqlite3_stmt*)res.statement, (int)i + 1, q.Parameters[i].c_str (), (int)q.Parameters[i].size (), SQLITE_STATIC);
+		sqlite3_bind_text (statement, (int)i + 1, q.Parameters[i].c_str (), (int)q.Parameters[i].size (), SQLITE_STATIC);
 	}
 
 	//init the result set if has values
-	switch (int Code = sqlite3_step ((sqlite3_stmt*)res.statement))
+	switch (int Code = sqlite3_step (statement))
 	{
 		case SQLITE_ROW:
 			{//get cols
-				int ColCnt = sqlite3_column_count ((sqlite3_stmt*)res.statement);
-				std::vector<std::string> ColNames;
-				for (int i = 0; i < ColCnt; ++i)
+				std::map<std::string, std::string> row;
+				int cols = sqlite3_column_count (statement);
+				//add cols to result
+				for (int i = 0; i < cols; ++i)
 				{
-					ColNames.push_back (sqlite3_column_name ((sqlite3_stmt*)res.statement, i));
+					//sdd elements
+					std::string column_name = sqlite3_column_name (statement, i);
+					const unsigned char* column_value = sqlite3_column_text (statement, i);
+					row[column_name] = column_value ? rc<const char*> (column_value) : "";
 				}
-
-				//add them to the map and assign vector pointers
-				for (const auto& col : ColNames)
-				{
-					res.CurrentVal[col] = "";
-					res.CurrentValVector.push_back (&res.CurrentVal[col]);
-				}
-
-				//add first fields
-				for (int i = 0; i < res.CurrentVal.size (); ++i)
-				{
-					const char* Field = (const char*)sqlite3_column_text ((sqlite3_stmt*)res.statement, i);
-					if (Field)
-						*res.CurrentValVector[i] = std::string (Field);
-				}
+				res.Data.push_back (row);
 			}
 			res.HasData = true;
 
@@ -216,7 +198,7 @@ SQL::Result SQL::Database::ExecutePreparedInPlace (const ParameterizedQuery& q)
 			res.HasData = false;
 			return res;
 		default:
-			sqlite3_finalize ((sqlite3_stmt*)res.statement);
+			sqlite3_finalize (statement);
 			throw Exception (SQLITE_ERROR, "An error occured");
 	}
 }
@@ -247,27 +229,27 @@ SQL::ParameterizedQuery::ParameterizedQuery (const char* q, std::vector<std::str
 	Query (q), Parameters (params)
 {}
 
-SQL::Iterator SQL::Result::begin ()
-{
-	return Iterator (this);
-}
+//SQL::Iterator SQL::Result::begin ()
+//{
+//	return Iterator (this);
+//}
 
-SQL::Iterator SQL::Result::end ()
-{
-	return Iterator (nullptr);
-}
+//SQL::Iterator SQL::Result::end ()
+//{
+//	return Iterator (nullptr);
+//}
 
 //clears the iterator if it is not empty
 //this is needed because only one query can be open per connection
 
-void SQL::Result::clear ()
-{
-	//clears all rows
-	for (auto& i : *this)
-	{
-		NULL;
-	}
-}
+//void SQL::Result::clear ()
+//{
+//	//clears all rows
+//	for (auto& i : *this)
+//	{
+//		NULL;
+//	}
+//}
 
 SQL::Result::~Result ()
 {
@@ -275,51 +257,51 @@ SQL::Result::~Result ()
 //		sqlite3_finalize ((sqlite3_stmt*)statement);
 }
 
-std::map<std::string, std::string>& SQL::Iterator::operator*() const
-{
-	return res->CurrentVal;
-}
+//std::map<std::string, std::string>& SQL::Iterator::operator*() const
+//{
+//	return *res->CurrentVal;
+//}
+//
+//std::map<std::string, std::string>* SQL::Iterator::operator->()
+//{
+//	return (res->CurrentVal);
+//}
 
-std::map<std::string, std::string>* SQL::Iterator::operator->()
-{
-	return &(res->CurrentVal);
-}
-
-SQL::Iterator& SQL::Iterator::operator++()
-{
-	//step a row, copy results or set null if done / error
-	switch (int Code = sqlite3_step ((sqlite3_stmt*)res->statement))
-	{
-	case SQLITE_ROW:
-		//copy vals
-		for (int i = 0; i < res->CurrentVal.size(); ++i)
-		{
-			const char* Field = (const char*)sqlite3_column_text ((sqlite3_stmt*)res->statement, i);
-			if (Field)
-				*res->CurrentValVector[i] = std::string (Field);
-		}
-		return *this;
-	case SQLITE_DONE:
-		sqlite3_finalize ((sqlite3_stmt*)res->statement);
-		res->statement = 0;
-		if (res->inExecution)
-			*res->inExecution = false;
-		res = nullptr;
-		return *this;
-	case SQLITE_INTERRUPT:
-		sqlite3_finalize ((sqlite3_stmt*)res->statement);
-		res->statement = 0;
-		if (res->inExecution)
-			*res->inExecution = false;
-		res = nullptr;
-		return *this;
-	default:
-		sqlite3_finalize ((sqlite3_stmt*)res->statement);
-		res->statement = 0;
-		res = nullptr;
-		throw Exception (SQLITE_ERROR, "An error occured");
-	}
-}
+//SQL::Iterator& SQL::Iterator::operator++()
+//{
+//	//step a row, copy results or set null if done / error
+//	switch (int Code = sqlite3_step ((sqlite3_stmt*)res->statement))
+//	{
+//	case SQLITE_ROW:
+//		//copy vals
+//		for (int i = 0; i < res->CurrentVal->size(); ++i)
+//		{
+//			const char* Field = (const char*)sqlite3_column_text ((sqlite3_stmt*)res->statement, i);
+//			if (Field)
+//				*res->CurrentValVector[i] = std::string (Field);
+//		}
+//		return *this;
+//	case SQLITE_DONE:
+//		sqlite3_finalize ((sqlite3_stmt*)res->statement);
+//		res->statement = 0;
+//		if (res->inExecution)
+//			*res->inExecution = false;
+//		res = nullptr;
+//		return *this;
+//	case SQLITE_INTERRUPT:
+//		sqlite3_finalize ((sqlite3_stmt*)res->statement);
+//		res->statement = 0;
+//		if (res->inExecution)
+//			*res->inExecution = false;
+//		res = nullptr;
+//		return *this;
+//	default:
+//		sqlite3_finalize ((sqlite3_stmt*)res->statement);
+//		res->statement = 0;
+//		res = nullptr;
+//		throw Exception (SQLITE_ERROR, "An error occured");
+//	}
+//}
 
 
 #ifdef NO_DEF
@@ -411,21 +393,13 @@ void SQL::Transaction::Execute (const Query q)
 
 SQL::Result SQL::Transaction::ExecutePrepared (const ParameterizedQuery& q)
 {
-	if (inExecution)
-		sqlite3_interrupt (rc<sqlite3*> (database));
-	inExecution = true;
-	Result res = database->ExecutePreparedInPlace (q);
-	res.inExecution = &inExecution;
+	Result res = database->ExecutePrepared (q);
 	return res;
 }
 
 SQL::Result SQL::Transaction::ExecutePrepared (const Query& q)
 {
-	if (inExecution)
-		sqlite3_interrupt (rc<sqlite3*> (database));
-	inExecution = true;
-	Result res = database->ExecutePreparedInPlace (q);
-	res.inExecution = &inExecution;
+	Result res = database->ExecutePrepared (q);
 	return res;
 }
 

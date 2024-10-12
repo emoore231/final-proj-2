@@ -59,7 +59,7 @@ bool DatabaseDeleteRecordMenu () try
 
 			SQL::Result res = database.ExecutePrepared (SQL::Query (query));
 
-			for (const auto& i : res)
+			for (const auto& i : res.Data)
 			{
 				std::cout << i.at ("ID") << ": " << i << lf;
 				k++;

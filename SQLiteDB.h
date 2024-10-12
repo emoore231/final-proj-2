@@ -87,81 +87,83 @@ namespace SQL
 		friend class Transaction;
 	private:
 
-		void* statement;
-		std::map<std::string, std::string> CurrentVal;//holds the current value of the iterator
-		std::vector<std::string*> CurrentValVector;//to interact with fields by index, so the iterators can directly replace the vals of CurrentVal
-
-		bool HasData;
-
-		//only used for the transaction class
-		bool* inExecution = nullptr;
+		//void* statement;
+		//std::map<std::string, std::string>* CurrentVal;//holds the current value of the iterator
+		//std::vector<std::string*> CurrentValVector;//to interact with fields by index, so the iterators can directly replace the vals of CurrentVal
+		//
+		//
+		////only used for the transaction class
+		//bool* inExecution = nullptr;
 
 	public:
-		Iterator begin ();
-		Iterator end ();
-
-		//clears the iterator if it is not empty
-		//this is needed because only one query can be open per connection
-		void clear ();
-
+		//Iterator begin ();
+		//Iterator end ();
+		//
+		////clears the iterator if it is not empty
+		////this is needed because only one query can be open per connection
+		//void clear ();
+		//
 		~Result ();
+
+		bool HasData;
+		std::vector < std::map<std::string, std::string>> Data;
 	};
 
 	//iterator from a result
-	class Iterator
-	{
-	public:
-		//iterator defs
-		using iterator_category = std::input_iterator_tag;
-		using difference_type = size_t;
-		using value_type = std::map<std::string, std::string>;
-		using pointer = value_type*;
-		using reference = value_type&;
+	//class Iterator
+	//{
+	//public:
+	//	//iterator defs
+	//	using iterator_category = std::input_iterator_tag;
+	//	using difference_type = size_t;
+	//	using value_type = std::map<std::string, std::string>;
+	//	using pointer = value_type*;
+	//	using reference = value_type&;
 
-		//goes back to the result
-		Result* res;//nullptr means end()
-
-
-	public:
-		Iterator (const Iterator&) = delete;
-		Iterator (Iterator&& rhs) noexcept(true)
-		{
-			res = rhs.res;
-			rhs.res = NULL;
-		}
+	//	//goes back to the result
+	//	Result* res;//nullptr means end()
 
 
-		Iterator (Result* r) : res (r)
-		{
-			if (!r)
-				res = nullptr;
-			else if (!(r->HasData))//no data, set to null iterator
-				res = nullptr;
-		}
+	//public:
+	//	Iterator (const Iterator&) = delete;
+	//	Iterator (Iterator&& rhs) noexcept(true)
+	//	{
+	//		res = rhs.res;
+	//		rhs.res = NULL;
+	//	}
 
-		//deref
-		reference operator*() const;
-		pointer operator->();
 
-		// Prefix increment
-		Iterator& operator++();
+	//	Iterator (Result* r) : res (r)
+	//	{
+	//		if (!r)
+	//			res = nullptr;
+	//		else if (!(r->HasData))//no data, set to null iterator
+	//			res = nullptr;
+	//	}
 
-		// Postfix increment
-		void operator++(int)
-		{
-			(void)this->operator++();
-		}
+	//	//deref
+	//	reference operator*() const;
+	//	pointer operator->();
 
-		//since these are input iterators, very simple checking is sufficent
-		friend bool operator== (const Iterator& a, const Iterator& b)
-		{
-			return a.res == b.res;
-		}
-		friend bool operator!= (const Iterator& a, const Iterator& b)
-		{
-			return a.res != b.res;
-		}
-	};
+	//	// Prefix increment
+	//	Iterator& operator++();
+
+	//	// Postfix increment
+	//	void operator++(int)
+	//	{
+	//		(void)this->operator++();
+	//	}
+
+	//	//since these are input iterators, very simple checking is sufficent
+	//	friend bool operator== (const Iterator& a, const Iterator& b)
+	//	{
+	//		return a.res == b.res;
+	//	}
+	//	friend bool operator!= (const Iterator& a, const Iterator& b)
+	//	{
+	//		return a.res != b.res;
+	//	}
+	//};
 
 	class Transaction;
 
