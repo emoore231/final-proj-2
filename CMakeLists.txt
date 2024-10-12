@@ -15,7 +15,7 @@ project ("CMakeProject5")
 add_executable (CMakeProject5 "main.cpp" "DatabaseAdvancedManipulationMenu.cpp" "DatabaseBeginTransactionMenu.cpp" "DatabaseCommitTransactionMenu.cpp" "DatabaseDeleteRecordMenu.cpp" "DatabaseGenerateReports.cpp" "DatabaseInsertRecordIntoTableMenu.cpp" "DatabaseMainMenu.cpp" "DatabaseRollbackTransactionMenu.cpp" "DatabaseStandardEntryMenu.cpp" "DatabaseUpdateRecordMenu.cpp" "SQLiteDB.cpp" "sqlite3.c")
 
 if (CMAKE_VERSION VERSION_GREATER 3.12)
-  set_property(TARGET CMakeProject5 PROPERTY CXX_STANDARD 20)
+  set_property(TARGET CMakeProject5 PROPERTY CXX_STANDARD 14)
 endif()
 
 # TODO: Add tests and install targets if needed.
