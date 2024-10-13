@@ -23,3 +23,4 @@ g++ -g $cpp_objects $c_objects -o "$output"
 g++ -g $cpp_objects $c_objects -o main2
 
 echo "Compilation finished. Output: $output"
+ 
