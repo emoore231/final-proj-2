@@ -23,8 +23,8 @@ done
 
 echo "Linking files"
 
-g++ -g $cpp_objects $c_objects -o "$output"
-g++ -g $cpp_objects $c_objects -o main2
+g++ -g $cpp_objects $c_objects -lpthread -ldl -o "$output"
+g++ -g $cpp_objects $c_objects -lpthread -ldl -o main2
 
 echo "Compilation finished. Output: $output"
  
