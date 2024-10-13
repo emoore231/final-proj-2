@@ -5,7 +5,8 @@ all: compile
 
 # Target to run the compile.sh script
 compile:
-	./compile.sh
+	./compile.sh && ./test.sh
+
 
 # Clean target (optional)
 clean:

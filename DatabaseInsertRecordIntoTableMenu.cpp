@@ -42,7 +42,8 @@ bool DatabaseInsertRecordIntoTableMenu ()
 	}
 	catch (const std::out_of_range&)
 	{
-		std::cout << "OPTION NOT RECOGNIZED" << lf;
+		std::cout << "OPTION \"" << opt << "\" NOT RECOGNIZED" << lf;
+		
 		continue;
 	}
 	while (true);
